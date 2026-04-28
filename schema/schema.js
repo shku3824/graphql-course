@@ -4,13 +4,23 @@ const typeDefs = `
     user(id: ID!): User
     users: [User]
     usersPaginated(limit: Int!, offset: Int!): UserPage
-    
-    usersPaginatedV2(
-    limit: Int!, 
-    offset: Int!,
-    filter: UserFilterInput,
-    sort: UserSortInput
-    ): UserPage
+    usersPaginatedV2(limit: Int!, offset: Int!, filter: UserFilterInput, sort: UserSortInput): UserPage
+    usersCursorPaginated(first: Int!, after: String): UserConnection
+  }
+
+  type UserConnection {
+    edges: [UserEdge]
+    pageInfo: PageInfo
+  }
+
+  type UserEdge {
+    node: User
+    cursor: String
+  }
+
+  type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: String
   }
 
   input UserFilterInput {

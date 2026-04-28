@@ -100,6 +100,41 @@ class UserService {
 
   }
 
+  async getUsersCursorPaginated(first, after) {
+
+    if(!first || first === ''){
+      throw new Error('Invalid Input: Number of records to fetch is required');
+    }
+
+    if(first > 50){
+      throw new GraphQLError('Invalid input: Cannot fetch more than 50 records at a time.', {
+        extensions: {
+          code: 'BAD_USER_INPUT',
+          invalidArgs: ['ROWS_TO_FETCH']
+        }
+      });
+    }
+    const limit = Number(first);
+    const cursor = after ? Number(after) : 0;
+
+    const selectQuery = `select id, name, age, email from users WHERE id> ${cursor} ORDER BY id asc LIMIT ${limit+1}`;
+    const [rows] = await pool.query(selectQuery);
+
+    const slicedRows = rows.slice(0,limit);
+
+    return {
+        edges: slicedRows.map(row => ({
+          node: row,
+          cursor: row.id.toString()
+        })),
+        pageInfo: {
+          hasNextPage: rows.length > limit,
+          endCursor: slicedRows.length
+        ? slicedRows[slicedRows.length - 1].id.toString()
+        : null}
+    };
+  }
+
 
   async createUser(name, age, email) {
 

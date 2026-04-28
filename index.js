@@ -24,7 +24,11 @@ const resolvers = {
     usersPaginatedV2: (_, { limit, offset, filter, sort }, context) => {
       console.log('Inside index.js Resolver usersPaginatedAdvanced - Limit:', limit, 'Offset:', offset, 'Filter:', filter, 'Sort:', sort);
       return context.userService.getUsersWithPaginationAndFiltering(limit, offset, filter, sort);
+    },
+    usersCursorPaginated: (_, {first, after}, context) => {
+      return context.userService.getUsersCursorPaginated(first, after);
     }
+    //getUsersCursorPaginated
   },
     // You can add Mutation resolvers here if needed
   Mutation: {
